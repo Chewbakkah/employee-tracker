@@ -14,14 +14,14 @@ VALUES
     ('cs-manager', '60000.00', '2'),
     ('exec-manager', '90000.00', '5');
 
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
+INSERT INTO employee (first_name, last_name, role_id, is_manager, manager_id)
 VALUES
-    ('kim', 'gower', '7'),
-    ('adam', 'ferrera', '3', '1'),
-    ('keith', 'hoffmeister', '6', '1'),
-    ('tom', 'haverford', '9', '3'),
-    ('april', 'ludgate', '12', '3'),
-    ('cheyne', 'etie', '2','2'),
-    ('nick', 'anders', '1','2'),
-    ('jared', 'worsham', '4', '3'),
-    ('caity', 'etie', '5', '3');
+    ('kim', 'gower', '7', true),
+    ('adam', 'ferrera', '3', true, '1'),
+    ('keith', 'hoffmeister', '6', true, '1'),
+    ('tom', 'haverford', '9', false, '3'),
+    ('april', 'ludgate', '12', false, '3'),
+    ('cheyne', 'etie', '2', false,'2'),
+    ('nick', 'anders', '1', false,'2'),
+    ('jared', 'worsham', '4', false, '3'),
+    ('caity', 'etie', '5', false, '3');
