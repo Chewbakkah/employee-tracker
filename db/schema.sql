@@ -1,13 +1,13 @@
+DROP DATABASE IF EXISTS employee_tracker_db;
+CREATE DATABASE employee_tracker_db;
+USE employee_tracker_db;
 DROP TABLE IF EXISTS department;
 DROP TABLE IF EXISTS roles;
 DROP TABLE IF EXISTS employee;
 
-DROP DATABASE IF EXISTS employee_tracker_db;
-CREATE DATABASE employee_tracker_db;
-
 CREATE TABLE department (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR (30) NOT NULL
+    dept_name VARCHAR (30) NOT NULL
 );
 
 CREATE TABLE roles(
@@ -25,6 +25,6 @@ CREATE TABLE employee (
     role_id INTEGER NOT NULL,
     is_manager BOOLEAN NOT NULL,
     manager_id INTEGER,
-    CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL,
-    CONSTRAINT fk_manager FOREIGN KEY (employee_id) REFERENCES employee(id) ON DELETE SET NULL
+    CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES roles(id),
+    CONSTRAINT fk_manager FOREIGN KEY (manager_id) REFERENCES employee(id) ON DELETE SET NULL
 )

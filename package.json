@@ -1,7 +1,25 @@
 {
   "dependencies": {
-    "console.table": "^0.10.0",
+    "dotenv": "^16.0.0",
     "inquirer": "^8.2.0",
     "mysql2": "^2.3.3"
-  }
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "employee-tracker",
+  "description": "",
+  "version": "1.0.0",
+  "main": "server.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chewbakkah/employee-tracker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Chewbakkah/employee-tracker/issues"
+  },
+  "homepage": "https://github.com/Chewbakkah/employee-tracker#readme"
 }
