@@ -106,7 +106,7 @@ const addDept = () => {
       },
     ])
     .then(function (answer) {
-      const sql = `INSERT INTO department (dept_name) VALUES ('${answer}')`;
+      const sql = `INSERT INTO department (dept_name) VALUES ('${answer.dept}')`;
       db.query(sql, (err, rows) => {
         if (err) {
           console.log(err);
@@ -125,39 +125,49 @@ const addRole = () => {
       console.log(err);
       return err;
     } else {
-      deptChoice.push(rows);
+      for (var i = 0; i < rows.length; i++) {
+        var deptList = rows[i].dept_name;
+        deptChoice.push(deptList);
+      }
     }
-
-    inquirer
-      .prompt([
-        {
-          type: "input",
-          name: "title",
-          message: "What is the title of the role you would like to add?",
-        },
-        {
-          type: "input",
-          name: "salary",
-          message: "What is the salary of the role?",
-        },
-        {
-          type: "input",
-          name: "department_id",
-          message: "Which department does this role belong to?",
-          choices: deptChoice,
-        },
-      ])
-      .then((answer) => {
-        const sql = `INSERT INTO roles (title, salary, department_id) VALUES ('${answer.title}', '${answer.salary}', '${answer.department_id}')`;
-        db.query(sql, (err, rows) => {
-          if (err) {
-            console.log(err);
-            return err;
-          }
-          promptUser();
-        });
-      });
   });
+
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "title",
+        message: "What is the title of the role you would like to add?",
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "What is the salary of the role?",
+      },
+      {
+        type: "rawlist",
+        name: "department_id",
+        message: "Which department does this role belong to?",
+        choices: deptChoice,
+      },
+    ])
+    .then((answer) => {
+      let choseDept;
+      for (var i = 0; i < deptChoice.length; i++) {
+        if (deptChoice[i] === answer.department_id) {
+          choseDept = i + 1;
+        }
+      }
+
+      const sql = `INSERT INTO roles (title, salary, department_id) VALUES ('${answer.title}', '${answer.salary}', '${choseDept}')`;
+      db.query(sql, (err, rows) => {
+        if (err) {
+          console.log(err);
+          return err;
+        }
+        promptUser();
+      });
+    });
 };
 
 module.exports = promptUser;
