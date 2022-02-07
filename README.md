@@ -1,6 +1,6 @@
 # employee-tracker
 
-[Walkthrough Video Click Here]()
+[Walkthrough Video Click Here](https://drive.google.com/file/d/1E6kMmkELpHLwzx0berNoHHLl_-_egkWV/view)
 
 ## Description
 
