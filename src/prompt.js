@@ -1,7 +1,79 @@
 const inquirer = require("inquirer");
 const db = require("../config/connection");
+let deptChoice = [];
+let roleChoice = [];
+let mgrChoice = [];
+let empChoice = [];
+
+const chooseDept = function () {
+  deptChoice = [];
+  let dept = `SELECT * FROM department`;
+  db.query(dept, (err, rows) => {
+    if (err) {
+      console.log(err);
+      return err;
+    } else {
+      for (var i = 0; i < rows.length; i++) {
+        var deptList = rows[i].dept_name;
+        deptChoice.push(deptList);
+      }
+    }
+  });
+};
+
+const chooseRole = function () {
+  roleChoice = [];
+  let role = `SELECT title FROM roles`;
+  db.query(role, (err, rows) => {
+    if (err) {
+      console.log(err);
+      return err;
+    } else {
+      for (var i = 0; i < rows.length; i++) {
+        var roleList = rows[i].title;
+        roleChoice.push(roleList);
+      }
+    }
+  });
+};
+
+const chooseMgr = function () {
+  mgrChoice = [];
+  let mgr = `SELECT CONCAT(first_name, ' ', last_name) AS name FROM employee WHERE is_manager = 1 ORDER BY id`;
+  db.query(mgr, (err, rows) => {
+    if (err) {
+      console.log(err);
+      return err;
+    } else {
+      for (var i = 0; i < rows.length; i++) {
+        var mgrList = rows[i].name;
+        mgrChoice.push(mgrList);
+      }
+    }
+  });
+};
+
+const chooseEmp = function () {
+  empChoice = [];
+  let emp = `SELECT CONCAT(first_name, ' ', last_name) AS name FROM employee ORDER BY id`;
+  db.query(emp, (err, rows) => {
+    if (err) {
+      console.log(err);
+      return err;
+    } else {
+      for (var i = 0; i < rows.length; i++) {
+        var empList = rows[i].name;
+        empChoice.push(empList);
+      }
+    }
+  });
+};
 
 const promptUser = () => {
+    chooseEmp();
+    chooseRole();
+    chooseMgr();
+    chooseDept();
   return inquirer
     .prompt([
       {
@@ -118,20 +190,7 @@ const addDept = () => {
 };
 
 const addRole = () => {
-  let deptChoice = [];
-  let dept = `SELECT * FROM department`;
-  db.query(dept, (err, rows) => {
-    if (err) {
-      console.log(err);
-      return err;
-    } else {
-      for (var i = 0; i < rows.length; i++) {
-        var deptList = rows[i].dept_name;
-        deptChoice.push(deptList);
-      }
-    }
-  });
-
+// 4
   inquirer
     .prompt([
       {
@@ -152,14 +211,154 @@ const addRole = () => {
       },
     ])
     .then((answer) => {
-      let choseDept;
+      let chosenDept;
       for (var i = 0; i < deptChoice.length; i++) {
         if (deptChoice[i] === answer.department_id) {
-          choseDept = i + 1;
+          chosenDept = i + 1;
         }
       }
 
-      const sql = `INSERT INTO roles (title, salary, department_id) VALUES ('${answer.title}', '${answer.salary}', '${choseDept}')`;
+      const sql = `INSERT INTO roles (title, salary, department_id) VALUES ('${answer.title}', '${answer.salary}', '${chosenDept}')`;
+      db.query(sql, (err, rows) => {
+        if (err) {
+          console.log(err);
+          return err;
+        }
+        promptUser();
+      });
+    });
+};
+
+const addEmployee = () => {
+//   chooseRole();
+//   chooseMgr();
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "first_name",
+        message: "Enter employee's first name:",
+      },
+      {
+        type: "input",
+        name: "last_name",
+        message: "Enter employee's last name:",
+      },
+      {
+        type: "rawlist",
+        name: "role_id",
+        message: "Select employee role:",
+        choices: roleChoice,
+      },
+      {
+        type: "rawlist",
+        name: "manager_id",
+        message: "Who is the employee's manager?",
+        choices: mgrChoice,
+      },
+      {
+        type: "confirm",
+        name: "is_manager",
+        message: "Is this person a manager?",
+        default: false,
+      },
+    ])
+    .then((answer) => {
+      let chosenRole;
+      for (var i = 0; i < roleChoice.length; i++) {
+        if (roleChoice[i] === answer.role_id) {
+          chosenRole = i + 1;
+        }
+      }
+      let chosenMgr;
+      for (var i = 0; i < mgrChoice.length; i++) {
+        if (mgrChoice[i] === answer.manager_id) {
+          chosenMgr = i + 1;
+        }
+      }
+      let chosenIs_manager;
+      if (answer.is_manager == false) {
+        chosenIs_manager = 0;
+      } else {
+        chosenIs_manager = 1;
+      }
+
+      const sql = `INSERT INTO employee (first_name, last_name, role_id, is_manager, manager_id) VALUES ('${answer.first_name}', '${answer.last_name}', '${chosenRole}', '${chosenIs_manager}', '${chosenMgr}')`;
+      db.query(sql, (err, rows) => {
+        if (err) {
+          console.log(err);
+          return err;
+        }
+        promptUser();
+      });
+    });
+};
+
+const updateEmp = () => {
+  inquirer
+    .prompt([
+      {
+        type: "rawlist",
+        name: "id",
+        message: "Choose Employee To Update",
+        choices: empChoice,
+      },
+      {
+        type: "input",
+        name: "first_name",
+        message: "Enter employee's first name:",
+      },
+      {
+        type: "input",
+        name: "last_name",
+        message: "Enter employee's last name:",
+      },
+      {
+        type: "rawlist",
+        name: "role_id",
+        message: "Select employee role",
+        choices: roleChoice,
+      },
+      {
+        type: "rawlist",
+        name: "manager_id",
+        message: "Who is the employee's manager?",
+        choices: mgrChoice,
+      },
+      {
+        type: "confirm",
+        name: "is_manager",
+        message: "Is this person a manager?",
+        default: false,
+      },
+    ])
+    .then((answer) => {
+        let chosenEmp;
+      for (var i = 0; i < empChoice.length; i++) {
+        if (empChoice[i] === answer.id) {
+          chosenEmp = i + 1;
+        }
+      }
+      let chosenRole;
+      for (var i = 0; i < roleChoice.length; i++) {
+        if (roleChoice[i] === answer.role_id) {
+          chosenRole = i + 1;
+        }
+      }
+      let chosenMgr;
+      for (var i = 0; i < mgrChoice.length; i++) {
+        if (mgrChoice[i] === answer.manager_id) {
+          chosenMgr = i + 1;
+        }
+      }
+      let chosenIs_manager;
+      if (answer.is_manager == false) {
+        chosenIs_manager = 0;
+      } else {
+        chosenIs_manager = 1;
+      }
+
+      const sql = `UPDATE employee SET first_name = '${answer.first_name}', last_name = '${answer.last_name}', role_id = '${chosenRole}', is_manager = '${chosenIs_manager}', manager_id = '${chosenMgr}' WHERE id = '${chosenEmp}'`;
       db.query(sql, (err, rows) => {
         if (err) {
           console.log(err);
