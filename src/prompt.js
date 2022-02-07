@@ -70,10 +70,10 @@ const chooseEmp = function () {
 };
 
 const promptUser = () => {
-    chooseEmp();
-    chooseRole();
-    chooseMgr();
-    chooseDept();
+  chooseEmp();
+  chooseRole();
+  chooseMgr();
+  chooseDept();
   return inquirer
     .prompt([
       {
@@ -88,6 +88,8 @@ const promptUser = () => {
           "Add a Role",
           "Add an Employee",
           "Update an Employee Role",
+          "View Manager's Employees",
+          "View Department Employees",
           "EXIT",
         ],
       },
@@ -121,6 +123,14 @@ const promptUser = () => {
         case "Update an Employee Role":
           updateEmp();
           break;
+
+        case "View Manager's Employees":
+          viewMgrEmp();
+          break;
+
+          case "View Department Employees":
+            viewDeptEmp();
+            break;
 
         case "EXIT":
           console.log("Thanks for using Employee Tracker!");
@@ -190,7 +200,6 @@ const addDept = () => {
 };
 
 const addRole = () => {
-// 4
   inquirer
     .prompt([
       {
@@ -230,8 +239,8 @@ const addRole = () => {
 };
 
 const addEmployee = () => {
-//   chooseRole();
-//   chooseMgr();
+  //   chooseRole();
+  //   chooseMgr();
   inquirer
     .prompt([
       {
@@ -333,7 +342,7 @@ const updateEmp = () => {
       },
     ])
     .then((answer) => {
-        let chosenEmp;
+      let chosenEmp;
       for (var i = 0; i < empChoice.length; i++) {
         if (empChoice[i] === answer.id) {
           chosenEmp = i + 1;
@@ -368,5 +377,65 @@ const updateEmp = () => {
       });
     });
 };
+
+const viewMgrEmp = () => {
+  inquirer
+    .prompt([
+      {
+        type: "rawlist",
+        name: "id",
+        message: "Choose Manager to View Team:",
+        choices: mgrChoice,
+      },
+    ])
+    .then((answer) => {
+      let chosenMgr;
+      for (var i = 0; i < mgrChoice.length; i++) {
+        if (mgrChoice[i] === answer.id) {
+          chosenMgr = i + 1;
+        }
+      }
+
+      const sql = `SELECT e.id, e.first_name, e.last_name, r.title, r.salary, d.dept_name FROM employee AS e JOIN roles AS r ON r.id = e.role_id JOIN department AS d ON d.id = r.department_id WHERE manager_id = '${chosenMgr}'`;
+      db.query(sql, (err, rows) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        console.table(rows);
+        promptUser();
+      });
+    });
+};
+
+const viewDeptEmp = () => {
+    inquirer
+      .prompt([
+        {
+          type: "rawlist",
+          name: "id",
+          message: "Choose Department to View Team:",
+          choices: deptChoice,
+        },
+      ])
+      .then((answer) => {
+        let chosenDept;
+        for (var i = 0; i < deptChoice.length; i++) {
+          if (deptChoice[i] === answer.id) {
+            chosenDept = i + 1;
+          }
+        }
+  
+        const sql = `SELECT e.id, e.first_name, e.last_name, r.title, r.salary, d.dept_name FROM employee AS e JOIN roles AS r ON r.id = e.role_id JOIN department AS d ON d.id = r.department_id WHERE department_id = '${chosenDept}'`;
+        db.query(sql, (err, rows) => {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          console.table(rows);
+          promptUser();
+        });
+      });
+  };
 
 module.exports = promptUser;
